@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -30,44 +31,56 @@ public class ToyStore {
     }
 
     public void drawPrizeToys(int count) {
+        if (count <= 0) {
+            System.out.println("Неверное количество игрушек");
+            return;
+        }
+
         int totalWeight = 0;
         for (Toy toy : toys) {
             totalWeight += toy.getWeight() * toy.getQuantity();
         }
 
-        Random random = new Random();
-        for (int i = 0; i < count; i++) {
-            int randomNumber = random.nextInt(totalWeight);
-            int currentWeight = 0;
-            for (Toy toy : toys) {
-                currentWeight += toy.getWeight() * toy.getQuantity();
-                if (randomNumber < currentWeight) {
-                    toy.setQuantity(toy.getQuantity() - 1);
-                    prizeToys.add(new Toy(toy.getId(), toy.getName(), 1, toy.getWeight()));
-                    totalWeight -= toy.getWeight();
-                    break;
-                }
-            }
-        }
-    }
-
-    public void getPrizeToy() {
-        if (prizeToys.isEmpty()) {
-            System.out.println("Призовых игрушек не осталось");
+        if (totalWeight == 0) {
+            System.out.println("Нет доступных игрушек");
             return;
         }
 
-        Toy prizeToy = prizeToys.remove(0);
-        System.out.println("Вы выиграли " + prizeToy.getName() + "!");
-        try {
-            File file = new File("prizeToys.txt");
-            FileWriter writer = new FileWriter(file, true);
-            writer.write(prizeToy.getName() + "\n");
-            writer.close();
+        if (count * 10 > totalWeight) {
+            System.out.println("Недостаточно игрушек для розыгрыша");
+            return;
+        }
+
+        Random random = new Random();
+        for (int i = 0; i < count; i++) {
+            int prizeToyWeight = 0;
+            while (prizeToyWeight == 0) {
+                int index = random.nextInt(toys.size());
+                Toy toy = toys.get(index);
+                if (toy.getQuantity() > 0) {
+                    prizeToyWeight = toy.getWeight();
+                    toy.setQuantity(toy.getQuantity() - 1);
+                    prizeToys.add(toy);
+                    toys.remove(index);
+                }
+            }
+        }
+        try (PrintWriter writer = new PrintWriter(new FileWriter("prizeToys.txt", true))) {
+            for (Toy toy : prizeToys) {
+                writer.println(toy.getName());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    } 
+
+    public void getPrizeToy() {
+        if (prizeToys.isEmpty()) {
+            System.out.println("Нет призовых игрушек");
+            return;
+        }
+        Toy toy = prizeToys.get(0);
+        System.out.println("Вы получили призовую игрушку: " + toy.getName());
+        prizeToys.remove(toy);
     }
-
 }
-

@@ -11,7 +11,7 @@ public class Programm {
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("1. Розыгрыш игрушек");
-            System.out.println("2. Получить игрушку");
+            System.out.println("2. Получить призовую игрушку");
             System.out.println("3. Добавить игрушку");
             System.out.println("4. Изменить игрушку");
             System.out.println("5. Выход");
@@ -21,7 +21,7 @@ public class Programm {
                     System.out.println("Введите количество призовых игрушек для розыгрыша: ");
                     int count = scanner.nextInt();
                     toyStore.drawPrizeToys(count);
-                    System.out.println(count + " розыгрыш призовых игрушек");
+                    System.out.println("Розыграно" + count + "призовых игрушек");
                     break;
                 case 2:
                     toyStore.getPrizeToy();
